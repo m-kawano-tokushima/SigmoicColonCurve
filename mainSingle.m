@@ -1,6 +1,8 @@
 timemax=70;
-res=zeros(timemax, 3);
-Vol=zeros(timemax, 3);
+Base=zeros(timemax,1);  % 中心電極での電位
+Vol=zeros(timemax, 3);  % 各測定電極での電位
+res=zeros(timemax, 3);  % 各電位差
+
 
 tate=-300:10:300;
 yoko=-300:10:300;
@@ -19,19 +21,23 @@ ConstrictionInterval=0;     % くびれの間隔
 
 % ----- 腸電図 ここから -----
 for i=1:timemax
-    Base=(10^3)*SigmoidColonCurve(i-1, Electrode0Position(1), Electrode0Position(2), Electrode0Position(3), ConstrictionInterval);
+    Base(i)=(10^3)*SigmoidColonCurve(i-1, Electrode0Position(1), Electrode0Position(2), Electrode0Position(3), ConstrictionInterval);
 
-    res(i,1)=(10^3)*SigmoidColonCurve(i-1, Electrode1Position(1), Electrode1Position(2), Electrode1Position(3), ConstrictionInterval)-Base;
-    res(i,2)=(10^3)*SigmoidColonCurve(i-1, Electrode2Position(1), Electrode2Position(2), Electrode2Position(3), ConstrictionInterval)-Base;
-    res(i,3)=(10^3)*SigmoidColonCurve(i-1, Electrode3Position(1), Electrode3Position(2), Electrode3Position(3), ConstrictionInterval)-Base;
+    Vol(i,1)=(10^3)*SigmoidColonCurve(i-1, Electrode1Position(1), Electrode1Position(2), Electrode1Position(3), ConstrictionInterval);
+    Vol(i,2)=(10^3)*SigmoidColonCurve(i-1, Electrode2Position(1), Electrode2Position(2), Electrode2Position(3), ConstrictionInterval);
+    Vol(i,3)=(10^3)*SigmoidColonCurve(i-1, Electrode3Position(1), Electrode3Position(2), Electrode3Position(3), ConstrictionInterval);
+    res(i,1)=Vol(i,1)-Base(i);
+    res(i,2)=Vol(i,2)-Base(i);
+    res(i,3)=Vol(i,3)-Base(i);
 end
 
+figure;
 time=0:69;
 plot(time,res(:,1)*10^9,'r', 'LineWidth', 2);hold on
 plot(time,res(:,2)*10^9,'g', 'LineWidth', 2)
 plot(time,res(:,3)*10^9,'b', 'LineWidth', 2);hold off
 set(gca, 'FontName','Century', 'FontSize',12)
-set(gca,'YTick',[-4,-2,0,2,4,6,8,10,12,14]);
+% set(gca,'YTick',[-4,-2,0,2,4,6,8,10,12,14]);
 % ylim([-4 14]);
 xlabel('Time[s]')
 ylabel('Amplitude[nV]')
