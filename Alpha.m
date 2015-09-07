@@ -23,5 +23,5 @@ function Ac=Alpha(Time, Frequency)
 % 150803
 theta=[-5/6*pi -3/4*pi -8/9*pi 17/18*pi 23/30*pi 7/10*pi 4/5*pi 13/15*pi 7/18*pi 5/12*pi 1/3*pi 1/4*pi 1/4*pi 13/36*pi 3/10*pi 1/6*pi 2/9*pi 0 -1/6*pi -1/12*pi -1/4*pi -1/3*pi -4/9*pi -2/5*pi -11/18*pi -5/9*pi -1/2*pi -5/9*pi -1/2*pi -1/2*pi];
 
-Ac=theta(rem(Time,30)+1);
+Ac=theta(Time);
 end
