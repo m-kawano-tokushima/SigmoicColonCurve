@@ -8,6 +8,7 @@ Rcb=0.0375*(10^3); % 円柱の基準半径：0.0375m
 
 time = rem(Time,30)+1;
 % Rcc(原点からバンド中心までの距離：手動)
+% Rcc=[15 15 15 15 15 15 15 15 15 15 15 15 15 15 15 15 15 15 15 15 15 15 15 15 15 15 15 15 15 15];
 % 基本形
 % Rcc=[20 18.5 17 16 16 16 17 18 21 15 12 10 9.5 9 9.5 10 12.5 24 20 18 16.5 16 16.5 17 19 21 21 20 17 12 20];
 
@@ -34,9 +35,12 @@ Density=-0.45.*10.^(-9)./(2.*Rcb.*pi.*Delta);
 Rc=RadiusCylinder(time, Rcb, CI);
 OQ=sqrt(Qx^2+Qy^2+Qz^2);
 Alpha_Q=atan(Qz/sqrt(Qx^2+Qy^2));
-Ac=Alpha(time, Frequency);
+% Ac=Alpha(time, Frequency);
+Ac=Alpha(time);
+% Pq=Phi_q(R, Ac, OQ, Qx, Qy, Qz);
 Pq=Phi_q(time, R, Ac, OQ, Qx, Qy, Qz);
 
+% Int=@(Theta, width) Density.*Inner_productDR(Theta, R, Rc, OQ, Pq, Alpha_Q, Ac)./(Rho(Theta, R, Rc, OQ, Alpha_Q, Pq, Ac).^2);
 Int=@(Theta, width) Density.*Inner_productDR(time, Theta, R, Rc, OQ, Pq, Alpha_Q, Ac)./(Rho(time, Theta, R, Rc, OQ, Alpha_Q, Pq, Ac).^2);
 
 V=integral2(Int, 0,Theta, 0,Delta)/(4.*pi.*Eps);
