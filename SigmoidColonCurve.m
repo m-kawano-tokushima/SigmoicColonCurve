@@ -30,10 +30,10 @@ R=Rcc(time)*10;
 
 % ダイポールモーメント密度 P/S
 % ダイポールモーメント 0.45.*10.^(-9)Cm
-Density=-0.45.*10.^(-9)./(2.*Rcb.*pi.*Delta);
+Density=0.45.*10.^(-9)./(2.*Rcb.*pi.*Delta);
 
 Rc=RadiusCylinder(time, Rcb, CI);
-OQ=sqrt(Qx^2+Qy^2+Qz^2);
+OQ=sqrt((Qx)^2+(Qy)^2+(Qz)^2);
 Alpha_Q=atan(Qz/sqrt(Qx^2+Qy^2));
 % Ac=Alpha(time, Frequency);
 Ac=Alpha(time);

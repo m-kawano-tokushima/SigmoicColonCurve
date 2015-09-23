@@ -2,16 +2,7 @@ timemax=70;
 Base=zeros(timemax,1);  % íÜêSìdã…Ç≈ÇÃìdà 
 Vol=zeros(timemax, 3);  % äeë™íËìdã…Ç≈ÇÃìdà 
 res=zeros(timemax, 3);  % äeìdà ç∑
-
-
-tate=-300:10:300;
-yoko=-300:10:300;
-map=zeros(numel(tate), numel(yoko), timemax);   % ïΩñ É}ÉbÉv(äÓèÄÅFñ≥å¿âì)
-map2=zeros(numel(tate), numel(yoko), timemax);  % ïΩñ É}ÉbÉv(äÓèÄÅFíÜêSìdã…)
-map3=zeros(numel(tate), numel(yoko), timemax);
-
-Max=zeros(timemax,61);
-MAX=zeros(1,timemax);
+onecycle=30;
 
 Electrode0Position=[0.0675*(10^3) 0.00*(10^3) 0.20*(10^3)];     % íÜêSìdã…à íu(ÉfÉJÉãÉgç¿ïWån)
 Electrode1Position=[0.0675*(10^3) 0.20*(10^3) 0.15*(10^3)];     % ìdã…-Ch1à íu(ÉfÉJÉãÉgç¿ïWån)
@@ -20,12 +11,54 @@ Electrode3Position=[0.0675*(10^3) -0.05*(10^3) 0.10*(10^3)];    % ìdã…-Ch3à íu(É
 ConstrictionInterval=0;     % Ç≠Ç—ÇÍÇÃä‘äu
 
 % ----- í∞ìdê} Ç±Ç±Ç©ÇÁ -----
-for i=1:timemax
-    Base(i)=(10^3)*SigmoidColonCurve(i-1, Electrode0Position(1), Electrode0Position(2), Electrode0Position(3), ConstrictionInterval);
 
-    Vol(i,1)=(10^3)*SigmoidColonCurve(i-1, Electrode1Position(1), Electrode1Position(2), Electrode1Position(3), ConstrictionInterval);
-    Vol(i,2)=(10^3)*SigmoidColonCurve(i-1, Electrode2Position(1), Electrode2Position(2), Electrode2Position(3), ConstrictionInterval);
-    Vol(i,3)=(10^3)*SigmoidColonCurve(i-1, Electrode3Position(1), Electrode3Position(2), Electrode3Position(3), ConstrictionInterval);
+for i=1:timemax
+    
+    %{
+        ------------------
+        ÉoÉìÉhÇ™ëÊ2ÅE3è€å¿Ç…Ç†ÇÈÇ∆Ç´
+        map(j,k,i)Ç180ìxâÒì]
+        ------------------
+    %}
+    
+    I=rem(i-1,onecycle)+1;
+    % Ç¢Ç´Çﬂ
+%     if I==2 || I==3 || I==4 || I==5 || I==8 || I==9 || I==10 || I==27 || I==28
+    % 150803
+    if I==1 || I==2 || I==3 || I==4 || I==5 || I==6 || I==7 || I==28
+        E0=[Electrode0Position(1) -Electrode0Position(2) -Electrode0Position(3)];
+        E1=[Electrode1Position(1) -Electrode1Position(2) -Electrode1Position(3)];
+        E2=[Electrode2Position(1) -Electrode2Position(2) -Electrode2Position(3)];
+        E3=[Electrode3Position(1) -Electrode3Position(2) -Electrode3Position(3)];
+    else
+        E0=[Electrode0Position(1) Electrode0Position(2) Electrode0Position(3)];
+        E1=[Electrode1Position(1) Electrode1Position(2) Electrode1Position(3)];
+        E2=[Electrode2Position(1) Electrode2Position(2) Electrode2Position(3)];
+        E3=[Electrode3Position(1) Electrode3Position(2) Electrode3Position(3)];
+    end
+    
+    Base(i)=(10^12)*SigmoidColonCurve(i-1, E0(1), E0(2), E0(3), ConstrictionInterval);
+
+    Vol(i,1)=(10^12)*SigmoidColonCurve(i-1, E1(1), E1(2), E1(3), ConstrictionInterval);
+    Vol(i,2)=(10^12)*SigmoidColonCurve(i-1, E2(1), E2(2), E2(3), ConstrictionInterval);
+    Vol(i,3)=(10^12)*SigmoidColonCurve(i-1, E3(1), E3(2), E3(3), ConstrictionInterval);
+    
+    %{
+        ------------------    
+        ÉoÉìÉhÇ™ëÊ3ÅE4è€å¿Ç…Ç†ÇÈÇ∆Ç´
+        map(j,k,i)ÇïÑçÜîΩì]
+        ------------------
+    %}
+    % Ç¢Ç´Çﬂ
+%     if I==1 || I==2 || I==3 || I==8 || I==9 || I==20 || I==21 || I==22 || I==23 || I==24 || I==25 || I==26 || I==27 || I==29 || I==30
+        % 150803
+    if I==1 || I==2 || I==3 || I==19 || I==20 || I==21 || I==22 || I==23 || I==24 || I==25 || I==26 || I==27 || I==29 || I==30
+        Base(i)=-Base(i);
+        Vol(i,1)=-Vol(i,1);
+        Vol(i,2)=-Vol(i,2);
+        Vol(i,3)=-Vol(i,3);
+    end
+    
     res(i,1)=Vol(i,1)-Base(i);
     res(i,2)=Vol(i,2)-Base(i);
     res(i,3)=Vol(i,3)-Base(i);
@@ -33,106 +66,129 @@ end
 
 figure;
 time=0:69;
-plot(time,res(:,1)*10^9,'r', 'LineWidth', 2);hold on
-plot(time,res(:,2)*10^9,'g', 'LineWidth', 2)
-plot(time,res(:,3)*10^9,'b', 'LineWidth', 2);hold off
+plot(time,res(:,1),'r', 'LineWidth', 2);hold on
+plot(time,res(:,2),'g', 'LineWidth', 2)
+plot(time,res(:,3),'b', 'LineWidth', 2);hold off
 set(gca, 'FontName','Century', 'FontSize',12)
+axis([0 69 -20 25]);
 % set(gca,'YTick',[-4,-2,0,2,4,6,8,10,12,14]);
 % ylim([-4 14]);
 xlabel('Time[s]')
 ylabel('Amplitude[nV]')
+%}
 % ----- í∞ìdê} Ç±Ç±Ç‹Ç≈ -----
 
 % ----- ìdà ï™ïz Ç±Ç±Ç©ÇÁ -----
-%{
-for i=1:timemax
-    Base=(10^3)*SigmoidColonCurve(i-1, Electrode0Position(1), Electrode0Position(2), Electrode0Position(3), ConstrictionInterval);
+% %{
 
-    for j=1:61
-        for k=1:28
-            map(j,k,i)=-(10^3)*(SigmoidColonCurve(i-1, Electrode0Position(1), tate(j), yoko(k), ConstrictionInterval));
-            map2(j,k,i)=map(j,k,i)-Base;
+tate=-250:10:250;
+yoko=-250:10:250;
+map=zeros(numel(tate), numel(yoko), onecycle);   % ïΩñ É}ÉbÉv(äÓèÄÅFñ≥å¿âì)
+corr=zeros(numel(tate), numel(yoko), onecycle);  % ï‚ê≥óp
+map2=zeros(numel(tate), numel(yoko), onecycle);  % ïΩñ É}ÉbÉv(äÓèÄÅFíÜêSìdã…)
+map3=zeros(numel(tate), numel(yoko), onecycle);
+
+Max=zeros(onecycle,51);
+MAX=zeros(1,onecycle);
+
+for i=1:onecycle
+    
+%     Base(i)=(10^12)*SigmoidColonCurve(i-1, Electrode0Position(1), Electrode0Position(2), Electrode0Position(3), ConstrictionInterval);
+
+    for j=1:51 % tate
+        for k=1:23 % yoko
+            map(j,k,i)=real((10^12)*(SigmoidColonCurve(i-1, Electrode0Position(1), tate(j), yoko(k), ConstrictionInterval)));
+%             map2(j,k,i)=map(j,k,i)-Base(i);
         end
         
-        for k=29:33
-        map(j,k,i)=0;
-%         map2(j,k,i)=map(j,k,i)-Base;
+        for k=24:28
+            map(j,k,i)=0;
+%             map2(j,k,i)=map(j,k,i)-Base(i);
         end
         
-        for k=34:61
-            map(j,k,i)=(10^3)*SigmoidColonCurve(i-1, Electrode0Position(1), tate(j), yoko(k), ConstrictionInterval);
-%             map2(j,k,i)=map(j,k,i)-Base;
+        for k=29:51
+            map(j,k,i)=real((10^12)*SigmoidColonCurve(i-1, Electrode0Position(1), tate(j), yoko(k), ConstrictionInterval));
+%             map2(j,k,i)=map(j,k,i)-Base(i);
         end
     end
     
     %{
         ------------------
-        ëÊ2ÅE3è€å¿ÇÕïÑçÜîΩì]
-        ------------------
-    %}
-    
-%     if i<13    % äÓñ{å`
+        ÉoÉìÉhÇ™ëÊ2ÅE3è€å¿Ç…Ç†ÇÈÇ∆Ç´     if abs(theta(i))>pi/2
+        map(j,k,i)Ç180ìxâÒì]
+    ------------------
+    %}    
+%     if i<13    % äÓñ{å` óvïœçX
 
-    % Cedars-Sinai
+    % Cedars-Sinai óvïœçX
 %     if i==1 || i==2 || i==3 || i==4 || i==5 || i==6 || i==7 || i==8 || i==9 || i==20 || i==21 || i==23 || i==24
     
-    % UniversityHospitalRadiologyGroup
+    % UniversityHospitalRadiologyGroup óvïœçX
 %     if i==1 || i==2 || i==3 || i==4 || i==5 || i==6 || i==7 || i==8 || i==25 || i==29
     
     % Ç¢Ç´ÇﬂëÂí∞„ËñÂäOâ»ì‡â»
-%     if i==2 || i==3 || i==4 || i==5 || i==9 || i==10
+%     if i==2 || i==3 || i==4 || i==5 || i==8 || i==9 || i==10 || i==27 || i==28
 
     % 150803
-    if i<9
-        map(:,:,i)=-map(:,:,i);
-%         map2(:,:,i)=-map2(:,:,i);
-%     elseif 19<i<25
-%         map(:,:,i)=-map(:,:,i);
-%         map2(:,:,i)=-map2(:,:,i);
+    if i==1 || i==2 || i==3 || i==4 || i==5 || i==6 || i==7 || i==28
+        for j=1:51
+            for k =1:51
+                corr(52-j,52-k,i)=map(j,k,i);
+            end
+        end
+
+        map(:,:,i)=corr(:,:,i);
     end
     
+    %{
+        ------------------
+        ÉoÉìÉhÇ™ëÊ3ÅE4è€å¿Ç…Ç†ÇÈÇ∆Ç´     if theta(i)>0 
+        map(j,k,i)ÇïÑçÜîΩì]
+        ------------------
+    %}
+    
+    % Ç¢Ç´Çﬂ
+%     if i==1 || i==2 || i==3 || i==8 || i==9 || i==20 || i==21 || i==22 || i==23 || i==24 || i==25 || i==26 || i==27 || i==29 || i==30
+        % 150803
+    if i==1 || i==2 || i==3 || i==19 || i==20 || i==21 || i==22 || i==23 || i==24 || i==25 || i==26 || i==27|| i==29 || i==30
+        map(:,:,i)=-map(:,:,i);
+    end
+    
+    Base(i)=map(26+Electrode0Position(2)/10,26+Electrode0Position(3)/10,i);
+    map2(:,:,i)=map(:,:,i)-Base(i);
+% %     else
+% %         map(:,:,i)=-map(:,:,i);
+% %         map2(:,:,i)=-map2(:,:,i);
+%     Base(i)=map(26+0,26+20,i);
     Max(i,:)=max(map(:,:,i));
     MAX(i)=max(Max(i,:));
     map3(:,:,i)=map(:,:,i)/MAX(i);
-end  
-
-[X2,Y2]=meshgrid(tate,yoko);
-for i=1:30
-%     subplot(5,6,i);
-    figure(i)
-    surf(X2,Y2,map(:,:,i).*10^9);
+end
+% %{
+[X2,Y2]=meshgrid(yoko,tate);
+figure;
+for i=1:onecycle
+    subplot(5,6,i);
+%     figure;
+    surf(X2,Y2,map2(:,:,i));
     shading('flat');
 %     colorbar;
-    caxis([0 MAX(i)*10^9]);
-    xlim([-300 300]);
-    ylim([-300 300]);
-    set(gca,'XTick',[-300,-200,-100,0,100,200,300]);
-    set(gca,'YTick',[-300,-200,-100,0,100,200,300]);
-%     view(90,-90);
-
-    %{
-        ------------------
-        ëÊ2ÅE3è€å¿ÇÕ+zï˚å¸Ç©ÇÁ
-        ëÊ1ÅE4è€å¿ÇÕ-zï˚å¸Ç©ÇÁ
-        èåèÇÕïÑçÜÇ∆ìØÇ∂
-        ------------------
-    %}
-    % 150803
-    if i<9
-        view(-90, -90)
-    else
-        view(90, -90)
-    end
+%     caxis([0 MAX(i)*10^9]);
+    xlim([-250 250]);
+    ylim([-250 250]);
+    set(gca,'XTick',[-250,-200,-150,-100,-50,0,50,100,150,200,250]);
+    set(gca,'YTick',[-250,-200,-150,-100,-50,0,50,100,150,200,250]);
+    view(90,90);
     
-    name=strcat('figure/fg',num2str(i));
-    saveas(gcf, name, 'jpg')
+%     name=strcat('figure/fg',num2str(i));
+%     saveas(gcf, name, 'jpg')
 end
-
+%{
 % avièoóÕ
 obj=VideoWriter('150803');
 obj.FrameRate=1;
 open(obj)
-for i=1:30
+for i=1:onecycle
     name=strcat('C:\Users\m-kawano\Documents\MATLAB\SigmoidColonCurve\figure\fg',num2str(i),'.jpg');
     image(imread(name));
     drawnow;
