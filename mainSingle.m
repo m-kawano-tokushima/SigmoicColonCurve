@@ -4,14 +4,15 @@ Vol=zeros(timemax, 3);  % 各測定電極での電位
 res=zeros(timemax, 3);  % 各電位差
 onecycle=30;
 
-Electrode0Position=[0.0675*(10^3) 0.00*(10^3) 0.20*(10^3)];     % 中心電極位置(デカルト座標系)
+% Electrode0Position=[0.0675*(10^3) 0.00*(10^3) 0.20*(10^3)];     % 中心電極位置(デカルト座標系)
+Electrode0Position=[0.0675*(10^3) 0.20*(10^3) 0.20*(10^3)];     % 中心電極位置(デカルト座標系)
 Electrode1Position=[0.0675*(10^3) 0.20*(10^3) 0.15*(10^3)];     % 電極-Ch1位置(デカルト座標系)
 Electrode2Position=[0.0675*(10^3) 0.10*(10^3) 0.12*(10^3)];     % 電極-Ch2位置(デカルト座標系)
 Electrode3Position=[0.0675*(10^3) -0.05*(10^3) 0.10*(10^3)];    % 電極-Ch3位置(デカルト座標系)
 ConstrictionInterval=0;     % くびれの間隔
 
-% ----- 腸電図 ここから -----
-
+% ----- 腸電図 ここから ----- 要変更
+%{
 for i=1:timemax
     
     %{
@@ -25,17 +26,17 @@ for i=1:timemax
     % いきめ
 %     if I==2 || I==3 || I==4 || I==5 || I==8 || I==9 || I==10 || I==27 || I==28
     % 150803
-    if I==1 || I==2 || I==3 || I==4 || I==5 || I==6 || I==7 || I==28
-        E0=[Electrode0Position(1) -Electrode0Position(2) -Electrode0Position(3)];
-        E1=[Electrode1Position(1) -Electrode1Position(2) -Electrode1Position(3)];
-        E2=[Electrode2Position(1) -Electrode2Position(2) -Electrode2Position(3)];
-        E3=[Electrode3Position(1) -Electrode3Position(2) -Electrode3Position(3)];
-    else
-        E0=[Electrode0Position(1) Electrode0Position(2) Electrode0Position(3)];
-        E1=[Electrode1Position(1) Electrode1Position(2) Electrode1Position(3)];
-        E2=[Electrode2Position(1) Electrode2Position(2) Electrode2Position(3)];
-        E3=[Electrode3Position(1) Electrode3Position(2) Electrode3Position(3)];
-    end
+%     if I==1 || I==2 || I==3 || I==4 || I==5 || I==6 || I==7 || I==28
+%         E0=[Electrode0Position(1) -Electrode0Position(2) -Electrode0Position(3)];
+%         E1=[Electrode1Position(1) -Electrode1Position(2) -Electrode1Position(3)];
+%         E2=[Electrode2Position(1) -Electrode2Position(2) -Electrode2Position(3)];
+%         E3=[Electrode3Position(1) -Electrode3Position(2) -Electrode3Position(3)];
+%     else
+%         E0=[Electrode0Position(1) Electrode0Position(2) Electrode0Position(3)];
+%         E1=[Electrode1Position(1) Electrode1Position(2) Electrode1Position(3)];
+%         E2=[Electrode2Position(1) Electrode2Position(2) Electrode2Position(3)];
+%         E3=[Electrode3Position(1) Electrode3Position(2) Electrode3Position(3)];
+%     end
     
     Base(i)=(10^12)*SigmoidColonCurve(i-1, E0(1), E0(2), E0(3), ConstrictionInterval);
 
@@ -52,12 +53,12 @@ for i=1:timemax
     % いきめ
 %     if I==1 || I==2 || I==3 || I==8 || I==9 || I==20 || I==21 || I==22 || I==23 || I==24 || I==25 || I==26 || I==27 || I==29 || I==30
         % 150803
-    if I==1 || I==2 || I==3 || I==19 || I==20 || I==21 || I==22 || I==23 || I==24 || I==25 || I==26 || I==27 || I==29 || I==30
-        Base(i)=-Base(i);
-        Vol(i,1)=-Vol(i,1);
-        Vol(i,2)=-Vol(i,2);
-        Vol(i,3)=-Vol(i,3);
-    end
+%     if I==1 || I==2 || I==3 || I==19 || I==20 || I==21 || I==22 || I==23 || I==24 || I==25 || I==26 || I==27 || i==28 || I==29 || I==30
+%         Base(i)=-Base(i);
+%         Vol(i,1)=-Vol(i,1);
+%         Vol(i,2)=-Vol(i,2);
+%         Vol(i,3)=-Vol(i,3);
+%     end
     
     res(i,1)=Vol(i,1)-Base(i);
     res(i,2)=Vol(i,2)-Base(i);
@@ -92,30 +93,26 @@ Max=zeros(onecycle,51);
 MAX=zeros(1,onecycle);
 
 for i=1:onecycle
-    
-%     Base(i)=(10^12)*SigmoidColonCurve(i-1, Electrode0Position(1), Electrode0Position(2), Electrode0Position(3), ConstrictionInterval);
-
-    for j=1:51 % tate
-        for k=1:23 % yoko
-            map(j,k,i)=real((10^12)*(SigmoidColonCurve(i-1, Electrode0Position(1), tate(j), yoko(k), ConstrictionInterval)));
-%             map2(j,k,i)=map(j,k,i)-Base(i);
-        end
-        
-        for k=24:28
-            map(j,k,i)=0;
-%             map2(j,k,i)=map(j,k,i)-Base(i);
-        end
-        
-        for k=29:51
-            map(j,k,i)=real((10^12)*SigmoidColonCurve(i-1, Electrode0Position(1), tate(j), yoko(k), ConstrictionInterval));
-%             map2(j,k,i)=map(j,k,i)-Base(i);
+    for j=1:51
+        if j==25||j==26||j==27
+            for k=1:51
+                map(j,k,i)=NaN;
+            end
+        else
+            for k=1:51 % yoko
+                if k==24 || k==25 || k==26 || k==27 || k==28
+                    map(j,k,i)=NaN;
+                else
+                    map(j,k,i)=real((10^12)*(SigmoidColonCurve(i-1, Electrode0Position(1), tate(j), yoko(k), ConstrictionInterval)));
+                end
+            end
         end
     end
     
     %{
         ------------------
         バンドが第2・3象限にあるとき     if abs(theta(i))>pi/2
-        map(j,k,i)を180度回転
+        map(j,k,i)を上下反転
     ------------------
     %}    
 %     if i<13    % 基本形 要変更
@@ -130,10 +127,10 @@ for i=1:onecycle
 %     if i==2 || i==3 || i==4 || i==5 || i==8 || i==9 || i==10 || i==27 || i==28
 
     % 150803
-    if i==1 || i==2 || i==3 || i==4 || i==5 || i==6 || i==7 || i==28
+    if i==1 || i==2 || i==3 || i==4 || i==5 || i==6 || i==7 || i==8 || i==28
         for j=1:51
             for k =1:51
-                corr(52-j,52-k,i)=map(j,k,i);
+                corr(j,52-k,i)=map(j,k,i);
             end
         end
 
@@ -150,16 +147,13 @@ for i=1:onecycle
     % いきめ
 %     if i==1 || i==2 || i==3 || i==8 || i==9 || i==20 || i==21 || i==22 || i==23 || i==24 || i==25 || i==26 || i==27 || i==29 || i==30
         % 150803
-    if i==1 || i==2 || i==3 || i==19 || i==20 || i==21 || i==22 || i==23 || i==24 || i==25 || i==26 || i==27|| i==29 || i==30
+    if i==1 || i==2 || i==3 || i==19 || i==20 || i==21 || i==22 || i==23 || i==24 || i==25 || i==26 || i==27 || i==29 || i==30
         map(:,:,i)=-map(:,:,i);
     end
     
     Base(i)=map(26+Electrode0Position(2)/10,26+Electrode0Position(3)/10,i);
     map2(:,:,i)=map(:,:,i)-Base(i);
-% %     else
-% %         map(:,:,i)=-map(:,:,i);
-% %         map2(:,:,i)=-map2(:,:,i);
-%     Base(i)=map(26+0,26+20,i);
+
     Max(i,:)=max(map(:,:,i));
     MAX(i)=max(Max(i,:));
     map3(:,:,i)=map(:,:,i)/MAX(i);

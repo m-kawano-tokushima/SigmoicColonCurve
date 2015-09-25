@@ -34,14 +34,26 @@ Density=0.45.*10.^(-9)./(2.*Rcb.*pi.*Delta);
 
 Rc=RadiusCylinder(time, Rcb, CI);
 OQ=sqrt((Qx)^2+(Qy)^2+(Qz)^2);
-Alpha_Q=atan(Qz/sqrt(Qx^2+Qy^2));
-% Ac=Alpha(time, Frequency);
-Ac=Alpha(time);
-% Pq=Phi_q(R, Ac, OQ, Qx, Qy, Qz);
-Pq=Phi_q(time, R, Ac, OQ, Qx, Qy, Qz);
+% Alpha_Q=atan(Qz/sqrt(Qy^2+Qx^2));                    % yz平面上でy軸と点Qの角度(∠QyOQz)
 
-% Int=@(Theta, width) Density.*Inner_productDR(Theta, R, Rc, OQ, Pq, Alpha_Q, Ac)./(Rho(Theta, R, Rc, OQ, Alpha_Q, Pq, Ac).^2);
-Int=@(Theta, width) Density.*Inner_productDR(time, Theta, R, Rc, OQ, Pq, Alpha_Q, Ac)./(Rho(time, Theta, R, Rc, OQ, Alpha_Q, Pq, Ac).^2);
+% if Qy==0
+%     Qy=-10;
+% end
+
+Alpha_Q=asin(Qz/sqrt(Qy^2+Qz^2));                    % yz平面上でy軸と点Qの角度(∠QyOQz)
+% if Qy<0
+%     Alpha_Q=pi-Alpha_Q;
+% end
+% if Qz<0
+%     Alpha_Q=-Alpha_Q;
+% end
+
+Ac=Alpha(time);                         % yz平面上でy軸と点Ocの角度(∠OcyOOcz)
+Phi_Q=acos(Qy/sqrt(Qx^2+Qy^2));         % xy平面上のy軸と点Qの角度(∠QyOQx)
+% Phi_Q=atan(Qx/sqrt(Qy^2+Qz^2));
+% Phi_Q=Phi_q(time, R, Ac, OQ, Qx, Qy, Qz);         % yz平面と点Qの角度(∠QyzOQx)
+
+Int=@(Theta, width) Density.*Inner_productDR(time, Theta, R, Rc, OQ, Phi_Q, Alpha_Q, Ac)./(Rho(time, Theta, R, Rc, OQ, Alpha_Q, Phi_Q, Ac).^2);
 
 V=integral2(Int, 0,Theta, 0,Delta)/(4.*pi.*Eps);
 end

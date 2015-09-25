@@ -9,16 +9,15 @@ function Pc=Phi_c(Time, Theta, RadiusCylinder, R)
 % Ocx=[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0];
 
 % Ç¢Ç´ÇﬂëÂí∞„ËñÂäOâ»ì‡â»
-Ocx=[-2 -3 -5 -7 -4 0 2 -2 -4 -2 0 0 0 -1 3 3 3 3 3 -1 0 0 1 1 -2 -4 -5 -7 -8 -8];
+% Ocx=[-2 -3 -5 -7 -4 0 2 -2 -4 -2 0 0 0 -1 3 3 3 3 3 -1 0 0 1 1 -2 -4 -5 -7 -8 -8];
 
 % 150803
-% Ocx=[0 2 -2 -2 -3 -1 2 5 5 5 1 2 2 3 -3 -1 -2 0 0 3 3 5 2 -2 2 2 -2 -5 -2 -1];
+Ocx=[0 2 -2 -2 -3 -1 2 5 5 5 1 2 2 3 -3 -1 -2 0 0 3 3 5 2 -2 2 2 -2 -5 -2 -1];
 
-OcAngle=atan(Ocx(Time)*10/R);    % yzïΩñ Ç∆OcÇÃäpìx
+OcAngle=asin(Ocx(Time)*10/sqrt(Ocx(Time)^2+R^2));    % yzïΩñ Ç∆OcÇÃäpìx
 
 % Å⁄OcOL
-OLAngle=acos((R.^2+OL(Theta, RadiusCylinder, R).^2-RadiusCylinder.^2)./(2.*R.*OL(Theta, RadiusCylinder, R)));
+OLAngle=asin(RadiusCylinder.*sin(Theta)./OL(Theta, RadiusCylinder, R));
 
-% Pc=OLAngle;
 Pc=OLAngle+OcAngle;
 end
