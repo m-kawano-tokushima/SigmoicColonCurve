@@ -102,8 +102,10 @@ for i=1:onecycle
             for k=1:51 % yoko
                 if k==24 || k==25 || k==26 || k==27 || k==28
                     map(j,k,i)=NaN;
+%                 elseif k>26
+%                     map(j,k,i)=-(10^12)*(SigmoidColonCurve(i-1, Electrode0Position(1), tate(j), yoko(k), ConstrictionInterval));
                 else
-                    map(j,k,i)=real((10^12)*(SigmoidColonCurve(i-1, Electrode0Position(1), tate(j), yoko(k), ConstrictionInterval)));
+                    map(j,k,i)=(10^12)*(SigmoidColonCurve(i-1, Electrode0Position(1), tate(j), yoko(k), ConstrictionInterval));
                 end
             end
         end
@@ -111,7 +113,7 @@ for i=1:onecycle
     
     %{
         ------------------
-        バンドが第2・3象限にあるとき     if abs(theta(i))>pi/2
+        バンドが第2・3象限にあるとき     if abs(theta(i))>=pi/2
         map(j,k,i)を上下反転
     ------------------
     %}    
@@ -124,10 +126,10 @@ for i=1:onecycle
 %     if i==1 || i==2 || i==3 || i==4 || i==5 || i==6 || i==7 || i==8 || i==25 || i==29
     
     % いきめ大腸肛門外科内科
-%     if i==2 || i==3 || i==4 || i==5 || i==8 || i==9 || i==10 || i==27 || i==28
+    if i==1 || i==2 || i==3 || i==4 || i==5 || i==6 || i==9 || i==10 || i==28
 
     % 150803
-    if i==1 || i==2 || i==3 || i==4 || i==5 || i==6 || i==7 || i==8 || i==28
+%     if i==1 || i==2 || i==3 || i==4 || i==5 || i==6 || i==7 || i==8 || i==28
         for j=1:51
             for k =1:51
                 corr(j,52-k,i)=map(j,k,i);
@@ -145,9 +147,9 @@ for i=1:onecycle
     %}
     
     % いきめ
-%     if i==1 || i==2 || i==3 || i==8 || i==9 || i==20 || i==21 || i==22 || i==23 || i==24 || i==25 || i==26 || i==27 || i==29 || i==30
+    if i==2 || i==3 || i==6 || i==10 || i==11 || i==20 || i==21 || i==22 || i==23 || i==24 || i==25 || i==26 || i==27 || i==29 || i==30
         % 150803
-    if i==1 || i==2 || i==3 || i==19 || i==20 || i==21 || i==22 || i==23 || i==24 || i==25 || i==26 || i==27 || i==29 || i==30
+%     if i==1 || i==2 || i==3 || i==19 || i==20 || i==21 || i==22 || i==23 || i==24 || i==25 || i==26 || i==27 || i==29 || i==30
         map(:,:,i)=-map(:,:,i);
     end
     
@@ -162,8 +164,8 @@ end
 [X2,Y2]=meshgrid(yoko,tate);
 figure;
 for i=1:onecycle
-    subplot(5,6,i);
-%     figure;
+%     subplot(5,6,i);
+    figure;
     surf(X2,Y2,map2(:,:,i));
     shading('flat');
 %     colorbar;
@@ -174,10 +176,10 @@ for i=1:onecycle
     set(gca,'YTick',[-250,-200,-150,-100,-50,0,50,100,150,200,250]);
     view(90,90);
     
-%     name=strcat('figure/fg',num2str(i));
-%     saveas(gcf, name, 'jpg')
+    name=strcat('figure/fg',num2str(i));
+    saveas(gcf, name, 'jpg')
 end
-%{
+% %{
 % avi出力
 obj=VideoWriter('150803');
 obj.FrameRate=1;

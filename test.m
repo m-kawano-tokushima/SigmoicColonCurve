@@ -18,40 +18,23 @@ testmap3=zeros(numel(tate), numel(yoko));
 Max=zeros(51);
 % MAX=zeros(1,onecycle);
 
-i=1;
+i=15;
 % for i=1:onecycle
     
 %     Base(i)=(10^12)*SigmoidColonCurve(i-1, Electrode0Position(1), Electrode0Position(2), Electrode0Position(3), ConstrictionInterval);
 
-    for j=1:51 % tate
-        
+    for j=1:51
         if j==25||j==26||j==27
             for k=1:51
                 testmap(j,k)=NaN;
             end
         else
-                
-            for k=1:24 % yoko
-%                 if j==25||j==26||j==27
-%                 testmap(j,k)=NaN;
-%                 else
-                testmap(j,k)=real((10^12)*(SigmoidColonCurve(i-1, Electrode0Position(1), tate(j), yoko(k), ConstrictionInterval)));
-    %             map2(j,k,i)=map(j,k,i)-Base(i);
-%                 end
-            end
-
-            for k=25:27
-                testmap(j,k)=NaN;
-    %             map2(j,k,i)=map(j,k,i)-Base(i);
-            end
-
-            for k=28:51
-                testmap(j,k)=real((10^12)*SigmoidColonCurve(i-1, Electrode0Position(1), tate(j), yoko(k), ConstrictionInterval));
-    %             map2(j,k,i)=map(j,k,i)-Base(i);
-
-    %         for k=24:51 % yoko
-    %             testmap(k,j)=real((10^12)*(SigmoidColonCurve(i-1, Electrode0Position(1), tate(52-j), yoko(52-k), ConstrictionInterval)));
-    %             map2(j,k,i)=map(j,k,i)-Base(i);
+            for k=1:51 % yoko
+                if k==24 || k==25 || k==26 || k==27 || k==28
+                    testmap(j,k)=NaN;
+                else
+                    testmap(j,k)=real((10^12)*(SigmoidColonCurve(i-1, Electrode0Position(1), tate(j), yoko(k), ConstrictionInterval)));
+                end
             end
         end
     end
@@ -71,22 +54,22 @@ i=1;
 %     if i==1 || i==2 || i==3 || i==4 || i==5 || i==6 || i==7 || i==8 || i==25 || i==29
     
     % ‚¢‚«‚ß‘å’°ãè–åŠO‰È“à‰È
-%     if i==2 || i==3 || i==4 || i==5 || i==8 || i==9 || i==10 || i==27 || i==28
-
-    % 150803
-    if i==1 || i==2 || i==3 || i==4 || i==5 || i==6 || i==7 || i==28
-        for j=1:51
-            for k =1:51
-%                     if j==25||j==26||j==27
-%                         testmap(j,k)=NaN;
-%                     else
-                    testcorr(j,52-k)=testmap(j,k);
-%                     end
-            end
-        end
-
-        testmap(:,:)=testcorr(:,:);
-    end
+%     if i==1 || i==2 || i==3 || i==4 || i==5 || i==6 || i==9 || i==10 || i==28
+% 
+%     % 150803
+% %     if i==1 || i==2 || i==3 || i==4 || i==5 || i==6 || i==7 || i==28
+%         for j=1:51
+%             for k =1:51
+% %                     if j==25||j==26||j==27
+% %                         testmap(j,k)=NaN;
+% %                     else
+%                     testcorr(j,52-k)=testmap(j,k);
+% %                     end
+%             end
+%         end
+% 
+%         testmap(:,:)=testcorr(:,:);
+%     end
     
     %{
         ------------------
@@ -96,11 +79,11 @@ i=1;
     %}
     
     % ‚¢‚«‚ß
-%     if i==1 || i==2 || i==3 || i==8 || i==9 || i==20 || i==21 || i==22 || i==23 || i==24 || i==25 || i==26 || i==27 || i==29 || i==30
-        % 150803
-    if i==1 || i==2 || i==3 || i==19 || i==20 || i==21 || i==22 || i==23 || i==24 || i==25 || i==26 || i==27|| i==29 || i==30
-        testmap(:,:)=-testmap(:,:);
-    end
+%     if i==2 || i==3 || i==10 || i==11 || i==20 || i==21 || i==22 || i==23 || i==24 || i==25 || i==26 || i==27 || i==28 || i==29 || i==30
+%         % 150803
+% %     if i==1 || i==2 || i==3 || i==19 || i==20 || i==21 || i==22 || i==23 || i==24 || i==25 || i==26 || i==27|| i==29 || i==30
+%         testmap(:,:)=-testmap(:,:);
+%     end
     
 %     testBase=testmap(26+Electrode0Position(2)/10,26+Electrode0Position(3)/10);
 %     testmap2(:,:)=testmap(:,:)-testBase;
