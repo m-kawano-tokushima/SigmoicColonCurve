@@ -3,7 +3,7 @@ base=zeros(70,1);
 dis=zeros(70,3);
 deff=zeros(70,3);
 
-Qb=[6.75 0 20];     % 中心電極位置(デカルト座標系)
+Qb=[6.75 20 20];     % 中心電極位置(デカルト座標系)
 Q1=[6.75 20 15];     % 電極-Ch1位置(デカルト座標系)
 Q2=[6.75 10 12];     % 電極-Ch2位置(デカルト座標系)
 Q3=[6.75 -5 10];    % 電極-Ch3位置(デカルト座標系)
@@ -40,6 +40,9 @@ xlabel('Time[s]')
 ylabel('distance[cm]')
 title('150803 dis');
 
+name=strcat('C:\Users\m-kawano\Documents\参考\CTcolonoscopy\一時/150803dis');
+saveas(gcf, name, 'jpg');
+
 figure(2);
 plot(time,deff(:,1),'r', 'LineWidth', 2);hold on
 plot(time,deff(:,2),'g', 'LineWidth', 2)
@@ -50,6 +53,9 @@ set(gca, 'FontName','Century', 'FontSize',12)
 xlabel('Time[s]')
 ylabel('deff of dis[cm]')
 title('150803 deff');
+
+name=strcat('C:\Users\m-kawano\Documents\参考\CTcolonoscopy\一時/150803deff');
+saveas(gcf, name, 'jpg');
 
 % --- いきめ大腸肛門外科内科 ---------------------------
 Ocx=[-2 -3 -5 -7 -4 0 2 -2 -4 -2 0 0 0 -1 3 3 3 3 3 -1 0 0 1 1 -2 -4 -5 -7 -8 -8];
@@ -83,6 +89,9 @@ xlabel('Time[s]')
 ylabel('distance[cm]')
 title('ikime dis');
 
+name=strcat('C:\Users\m-kawano\Documents\参考\CTcolonoscopy\一時/ikimedistance');
+saveas(gcf, name, 'jpg');
+
 figure(4);
 plot(time,deff(:,1),'r', 'LineWidth', 2);hold on
 plot(time,deff(:,2),'g', 'LineWidth', 2)
@@ -93,6 +102,6 @@ set(gca, 'FontName','Century', 'FontSize',12)
 xlabel('Time[s]')
 title('ikime deff');
 
+name=strcat('C:\Users\m-kawano\Documents\参考\CTcolonoscopy\一時/ikimedeff');
+saveas(gcf, name, 'jpg');
 % ------------------------------
-
-

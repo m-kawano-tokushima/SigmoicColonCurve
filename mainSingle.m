@@ -11,32 +11,32 @@ Electrode2Position=[0.0675*(10^3) 0.10*(10^3) 0.12*(10^3)];     % ìdã…-Ch2à íu(É
 Electrode3Position=[0.0675*(10^3) -0.05*(10^3) 0.10*(10^3)];    % ìdã…-Ch3à íu(ÉfÉJÉãÉgç¿ïWån)
 ConstrictionInterval=0;     % Ç≠Ç—ÇÍÇÃä‘äu
 
-% ----- í∞ìdê} Ç±Ç±Ç©ÇÁ ----- óvïœçX
+%% ----- í∞ìdê} Ç±Ç±Ç©ÇÁ ----- óvïœçX
 %{
 for i=1:timemax
     
     %{
         ------------------
-        ÉoÉìÉhÇ™ëÊ2ÅE3è€å¿Ç…Ç†ÇÈÇ∆Ç´
-        map(j,k,i)Ç180ìxâÒì]
+        ÉoÉìÉhÇ™ëÊ2ÅE3è€å¿Ç…Ç†ÇÈÇ∆Ç´     if abs(theta(i))>=pi/2
+        EPÇè„â∫îΩì]
         ------------------
     %}
     
     I=rem(i-1,onecycle)+1;
     % Ç¢Ç´Çﬂ
-%     if I==2 || I==3 || I==4 || I==5 || I==8 || I==9 || I==10 || I==27 || I==28
+%     if I==2 || I==3 || I==4 || I==5 || I==6 || I==9 || I==10 || I==28
     % 150803
-%     if I==1 || I==2 || I==3 || I==4 || I==5 || I==6 || I==7 || I==28
-%         E0=[Electrode0Position(1) -Electrode0Position(2) -Electrode0Position(3)];
-%         E1=[Electrode1Position(1) -Electrode1Position(2) -Electrode1Position(3)];
-%         E2=[Electrode2Position(1) -Electrode2Position(2) -Electrode2Position(3)];
-%         E3=[Electrode3Position(1) -Electrode3Position(2) -Electrode3Position(3)];
-%     else
-%         E0=[Electrode0Position(1) Electrode0Position(2) Electrode0Position(3)];
-%         E1=[Electrode1Position(1) Electrode1Position(2) Electrode1Position(3)];
-%         E2=[Electrode2Position(1) Electrode2Position(2) Electrode2Position(3)];
-%         E3=[Electrode3Position(1) Electrode3Position(2) Electrode3Position(3)];
-%     end
+    if I==1 || I==2 || I==3 || I==4 || I==5 || I==6 || I==7 || I==28
+        E0=[Electrode0Position(1) Electrode0Position(2) -Electrode0Position(3)];
+        E1=[Electrode1Position(1) Electrode1Position(2) -Electrode1Position(3)];
+        E2=[Electrode2Position(1) Electrode2Position(2) -Electrode2Position(3)];
+        E3=[Electrode3Position(1) Electrode3Position(2) -Electrode3Position(3)];
+    else
+        E0=[Electrode0Position(1) Electrode0Position(2) Electrode0Position(3)];
+        E1=[Electrode1Position(1) Electrode1Position(2) Electrode1Position(3)];
+        E2=[Electrode2Position(1) Electrode2Position(2) Electrode2Position(3)];
+        E3=[Electrode3Position(1) Electrode3Position(2) Electrode3Position(3)];
+    end
     
     Base(i)=(10^12)*SigmoidColonCurve(i-1, E0(1), E0(2), E0(3), ConstrictionInterval);
 
@@ -46,23 +46,19 @@ for i=1:timemax
     
     %{
         ------------------    
-        ÉoÉìÉhÇ™ëÊ3ÅE4è€å¿Ç…Ç†ÇÈÇ∆Ç´
-        map(j,k,i)ÇïÑçÜîΩì]
+        ÉoÉìÉhÇ™ëÊ3ÅE4è€å¿Ç…Ç†ÇÈÇ∆Ç´     if theta(i)>0 
+        Vol(i,:)ÇïÑçÜîΩì]
         ------------------
     %}
     % Ç¢Ç´Çﬂ
-%     if I==1 || I==2 || I==3 || I==8 || I==9 || I==20 || I==21 || I==22 || I==23 || I==24 || I==25 || I==26 || I==27 || I==29 || I==30
+%     if I==2 || I==3 || I==6 || I==10 || I==11 || I==20 || I==21 || I==22 || I==23 || I==24 || I==25 || I==26 || I==27 || I==29 || I==30
         % 150803
-%     if I==1 || I==2 || I==3 || I==19 || I==20 || I==21 || I==22 || I==23 || I==24 || I==25 || I==26 || I==27 || i==28 || I==29 || I==30
-%         Base(i)=-Base(i);
-%         Vol(i,1)=-Vol(i,1);
-%         Vol(i,2)=-Vol(i,2);
-%         Vol(i,3)=-Vol(i,3);
-%     end
+    if I==1 || I==2 || I==3 || I==19 || I==20 || I==21 || I==22 || I==23 || I==24 || I==25 || I==26 || I==27 || i==28 || I==29 || I==30
+        Base(i)=-Base(i);
+        Vol(i,:)=-Vol(i,:);
+    end
     
-    res(i,1)=Vol(i,1)-Base(i);
-    res(i,2)=Vol(i,2)-Base(i);
-    res(i,3)=Vol(i,3)-Base(i);
+    res(i,:)=Vol(i,:)-Base(i);
 end
 
 figure;
@@ -71,15 +67,18 @@ plot(time,res(:,1),'r', 'LineWidth', 2);hold on
 plot(time,res(:,2),'g', 'LineWidth', 2)
 plot(time,res(:,3),'b', 'LineWidth', 2);hold off
 set(gca, 'FontName','Century', 'FontSize',12)
-axis([0 69 -20 25]);
+axis([0 69 -0.3 15]);
 % set(gca,'YTick',[-4,-2,0,2,4,6,8,10,12,14]);
 % ylim([-4 14]);
 xlabel('Time[s]')
 ylabel('Amplitude[nV]')
+
+name=strcat('C:\Users\m-kawano\Documents\éQçl\CTcolonoscopy\àÍéû/sub');
+saveas(gcf, name, 'jpg');
 %}
 % ----- í∞ìdê} Ç±Ç±Ç‹Ç≈ -----
 
-% ----- ìdà ï™ïz Ç±Ç±Ç©ÇÁ -----
+%% ----- ìdà ï™ïz Ç±Ç±Ç©ÇÁ -----
 % %{
 
 tate=-250:10:250;
@@ -115,7 +114,7 @@ for i=1:onecycle
         ------------------
         ÉoÉìÉhÇ™ëÊ2ÅE3è€å¿Ç…Ç†ÇÈÇ∆Ç´     if abs(theta(i))>=pi/2
         map(j,k,i)Çè„â∫îΩì]
-    ------------------
+        ------------------
     %}    
 %     if i<13    % äÓñ{å` óvïœçX
 
@@ -176,20 +175,20 @@ for i=1:onecycle
     set(gca,'YTick',[-250,-200,-150,-100,-50,0,50,100,150,200,250]);
     view(90,90);
     
-    name=strcat('figure/fg',num2str(i));
+    name=strcat('C:\Users\m-kawano\Documents\éQçl\CTcolonoscopy\àÍéû/',num2str(i));
     saveas(gcf, name, 'jpg')
 end
 % %{
 % avièoóÕ
-obj=VideoWriter('150803');
+obj=VideoWriter('C:\Users\m-kawano\Documents\éQçl\CTcolonoscopy\àÍéû/modelname');
 obj.FrameRate=1;
 open(obj)
 for i=1:onecycle
-    name=strcat('C:\Users\m-kawano\Documents\MATLAB\SigmoidColonCurve\figure\fg',num2str(i),'.jpg');
+    name=strcat('C:\Users\m-kawano\Documents\éQçl\CTcolonoscopy\àÍéû/',num2str(i),'.jpg');
     image(imread(name));
     drawnow;
     writeVideo(obj,getframe);
 end
-close(obj)
+close(obj);
 %}
 % ----- ìdà ï™ïz Ç±Ç±Ç‹Ç≈ -----
