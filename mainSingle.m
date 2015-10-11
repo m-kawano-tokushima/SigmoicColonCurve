@@ -1,18 +1,19 @@
 timemax=70;
 Base=zeros(timemax,1);  % 中心電極での電位
-Vol=zeros(timemax, 3);  % 各測定電極での電位
-res=zeros(timemax, 3);  % 各電位差
+Vol=zeros(timemax, 5);  % 各測定電極での電位
+res=zeros(timemax, 5);  % 各電位差
 onecycle=30;
 
-% Electrode0Position=[0.0675*(10^3) 0.00*(10^3) 0.20*(10^3)];     % 中心電極位置(デカルト座標系)
 Electrode0Position=[0.0675*(10^3) 0.20*(10^3) 0.20*(10^3)];     % 中心電極位置(デカルト座標系)
-Electrode1Position=[0.0675*(10^3) 0.15*(10^3) 0.10*(10^3)];     % 電極-Ch1位置(デカルト座標系)
-Electrode2Position=[0.0675*(10^3) 0.13*(10^3) 0.20*(10^3)];     % 電極-Ch2位置(デカルト座標系)
-Electrode3Position=[0.0675*(10^3) 0.05*(10^3) 0.20*(10^3)];    % 電極-Ch3位置(デカルト座標系)
+Electrode1Position=[0.0675*(10^3) 0.13*(10^3) 0.08*(10^3)];     % 電極-Ch1位置(デカルト座標系)
+Electrode2Position=[0.0675*(10^3) 0.08*(10^3) 0.08*(10^3)];     % 電極-Ch2位置(デカルト座標系)
+Electrode3Position=[0.0675*(10^3) 0.05*(10^3) 0.15*(10^3)];    % 電極-Ch3位置(デカルト座標系)
+Electrode4Position=[0.0675*(10^3) 0.04*(10^3) 0.07*(10^3)];     % 電極-Ch4位置(デカルト座標系)
+Electrode5Position=[0.0675*(10^3) 0.03*(10^3) 0.13*(10^3)];    % 電極-Ch5位置(デカルト座標系)
 ConstrictionInterval=0;     % くびれの間隔
 
-%% ----- 腸電図 ここから ----- 要変更
-% %{
+%% ----- 腸電図 ここから -----
+%{
 for i=1:timemax
     
     %{
@@ -31,11 +32,15 @@ for i=1:timemax
         E1=[Electrode1Position(1) Electrode1Position(2) -Electrode1Position(3)];
         E2=[Electrode2Position(1) Electrode2Position(2) -Electrode2Position(3)];
         E3=[Electrode3Position(1) Electrode3Position(2) -Electrode3Position(3)];
+        E4=[Electrode4Position(1) Electrode4Position(2) -Electrode4Position(3)];
+        E5=[Electrode5Position(1) Electrode5Position(2) -Electrode5Position(3)];
     else
         E0=[Electrode0Position(1) Electrode0Position(2) Electrode0Position(3)];
         E1=[Electrode1Position(1) Electrode1Position(2) Electrode1Position(3)];
         E2=[Electrode2Position(1) Electrode2Position(2) Electrode2Position(3)];
         E3=[Electrode3Position(1) Electrode3Position(2) Electrode3Position(3)];
+        E4=[Electrode4Position(1) Electrode4Position(2) Electrode4Position(3)];
+        E5=[Electrode5Position(1) Electrode5Position(2) Electrode5Position(3)];
     end
     
     Base(i)=(10^12)*SigmoidColonCurve(i-1, E0(1), E0(2), E0(3), ConstrictionInterval);
@@ -43,6 +48,8 @@ for i=1:timemax
     Vol(i,1)=(10^12)*SigmoidColonCurve(i-1, E1(1), E1(2), E1(3), ConstrictionInterval);
     Vol(i,2)=(10^12)*SigmoidColonCurve(i-1, E2(1), E2(2), E2(3), ConstrictionInterval);
     Vol(i,3)=(10^12)*SigmoidColonCurve(i-1, E3(1), E3(2), E3(3), ConstrictionInterval);
+    Vol(i,4)=(10^12)*SigmoidColonCurve(i-1, E4(1), E4(2), E4(3), ConstrictionInterval);
+    Vol(i,5)=(10^12)*SigmoidColonCurve(i-1, E5(1), E5(2), E5(3), ConstrictionInterval);
     
     %{
         ------------------    
@@ -64,10 +71,12 @@ end
 figure;
 time=0:69;
 plot(time,res(:,1),'r', 'LineWidth', 2);hold on
-plot(time,res(:,2),'g', 'LineWidth', 2)
-plot(time,res(:,3),'b', 'LineWidth', 2);hold off
+plot(time,res(:,2),'g', 'LineWidth', 2);
+plot(time,res(:,3),'b', 'LineWidth', 2);
+plot(time,res(:,4),'y', 'LineWidth', 2);
+plot(time,res(:,5),'m', 'LineWidth', 2);hold off
 set(gca, 'FontName','Century', 'FontSize',12)
-axis([0 69 -0.3 15]);
+% axis([0 69 -0.3 15]);
 % set(gca,'YTick',[-4,-2,0,2,4,6,8,10,12,14]);
 % ylim([-4 14]);
 xlabel('Time[s]')
@@ -80,13 +89,14 @@ saveas(gcf, name, 'jpg');
 
 %% ----- 電位分布 ここから -----
 % %{
-
 tate=-250:10:250;
 yoko=-250:10:250;
 map=zeros(numel(tate), numel(yoko), onecycle);   % 平面マップ(基準：無限遠)
 corr=zeros(numel(tate), numel(yoko), onecycle);  % 補正用
 map2=zeros(numel(tate), numel(yoko), onecycle);  % 平面マップ(基準：中心電極)
 map3=zeros(numel(tate), numel(yoko), onecycle);
+% areaSum=zeros(onecycle, 4); % 指定象限内の電位の総和(1,2,3,4,All)
+SumArea=4;  % 総和を求める象限
 
 Max=zeros(onecycle,51);
 MAX=zeros(1,onecycle);
@@ -98,7 +108,7 @@ for i=1:onecycle
                 map(j,k,i)=NaN;
             end
         else
-            for k=1:51 % yoko
+            for k=1:51
                 if k==24 || k==25 || k==26 || k==27 || k==28
                     map(j,k,i)=NaN;
 %                 elseif k>26
@@ -112,7 +122,7 @@ for i=1:onecycle
     
     %{
         ------------------
-        バンドが第2・3象限にあるとき     if abs(theta(i))>=pi/2
+        バンドが第2・3象限にあるとき     if abs(theta(i))>2/3*pi
         map(j,k,i)を上下反転
         ------------------
     %}    
@@ -125,10 +135,13 @@ for i=1:onecycle
 %     if i==1 || i==2 || i==3 || i==4 || i==5 || i==6 || i==7 || i==8 || i==25 || i==29
     
     % いきめ大腸肛門外科内科
-    if i==1 || i==2 || i==3 || i==4 || i==5 || i==6 || i==9 || i==10 || i==28
+%     if i==1 || i==2 || i==3 || i==4 || i==5 || i==6 || i==9 || i==10 || i==28
 
     % 150803
 %     if i==1 || i==2 || i==3 || i==4 || i==5 || i==6 || i==7 || i==8 || i==28
+
+    % 1509182
+    if i==1 || i==2 || i==4 || i==5 || i==6 || i==25
         for j=1:51
             for k =1:51
                 corr(j,52-k,i)=map(j,k,i);
@@ -146,22 +159,27 @@ for i=1:onecycle
     %}
     
     % いきめ
-    if i==2 || i==3 || i==6 || i==10 || i==11 || i==20 || i==21 || i==22 || i==23 || i==24 || i==25 || i==26 || i==27 || i==29 || i==30
-        % 150803
+%     if i==2 || i==3 || i==6 || i==10 || i==11 || i==20 || i==21 || i==22 || i==23 || i==24 || i==25 || i==26 || i==27 || i==29 || i==30
+    
+    % 150806
 %     if i==1 || i==2 || i==3 || i==19 || i==20 || i==21 || i==22 || i==23 || i==24 || i==25 || i==26 || i==27 || i==29 || i==30
+
+    % 1509182
+    if i==1 || i==2 || i==3 || i==7 || i==8 || i==9 || i==17 || i==18 || i==19 || i==20 || i==21 || i==22 || i==23  || i==24 || i==25 || i==26 || i==27 || i==28 || i==29 || i==30
         map(:,:,i)=-map(:,:,i);
     end
     
     Base(i)=map(26+Electrode0Position(2)/10,26+Electrode0Position(3)/10,i);
     map2(:,:,i)=map(:,:,i)-Base(i);
 
-    Max(i,:)=max(map(:,:,i));
+    Max(i,:)=max(map2(:,:,i));
     MAX(i)=max(Max(i,:));
-    map3(:,:,i)=map(:,:,i)/MAX(i);
+    map3(:,:,i)=map2(:,:,i)/MAX(i);
 end
-% %{
+%{
+% 電位分布図　出力
 [X2,Y2]=meshgrid(yoko,tate);
-% figure;
+figure;
 for i=1:onecycle
 %     subplot(5,6,i);
     figure;
@@ -175,9 +193,10 @@ for i=1:onecycle
     set(gca,'YTick',[-250,-200,-150,-100,-50,0,50,100,150,200,250]);
     view(90,90);
     
-    name=strcat('C:\Users\m-kawano\Documents\参考\CTcolonoscopy\一時/',num2str(i));
-    saveas(gcf, name, 'jpg')
+%     name=strcat('C:\Users\m-kawano\Documents\参考\CTcolonoscopy\一時/',num2str(i));
+%     saveas(gcf, name, 'jpg')
 end
+
 % %{
 % avi出力
 obj=VideoWriter('C:\Users\m-kawano\Documents\参考\CTcolonoscopy\一時/modelname');
@@ -190,5 +209,44 @@ for i=1:onecycle
     writeVideo(obj,getframe);
 end
 close(obj);
+%}
+
+% %{
+% バンドが各象限に与える影響　出力
+areaSum=VVV(map3);
+time=0:29;
+figure;
+plot(time,areaSum(:,1),'r', 'LineWidth', 2);hold on
+plot(time,areaSum(:,2),'g', 'LineWidth', 2);
+plot(time,areaSum(:,3),'b', 'LineWidth', 2);
+plot(time,areaSum(:,4),'m', 'LineWidth', 2);hold off
+set(gca, 'FontName','Century', 'FontSize',12);
+% axis([0 69 -0.3 15]);
+% set(gca,'YTick',[-4,-2,0,2,4,6,8,10,12,14]);
+% ylim([-4 14]);
+xlabel('Time[s]');
+% ylabel('Amplitude[nV]');
+
+% name=strcat('C:\Users\m-kawano\Documents\参考\CTcolonoscopy\一時/areaSum');
+% saveas(gcf, name, 'jpg');
+%}
+% %{
+% バンドが指定象限に与える影響の詳細　出力
+areaSum=Vsum(map3, SumArea);
+time=0:29;
+figure;
+plot(time,areaSum(:,1),'r', 'LineWidth', 2);hold on
+plot(time,areaSum(:,2),'g', 'LineWidth', 2);
+plot(time,areaSum(:,3),'b', 'LineWidth', 2);
+plot(time,areaSum(:,4),'m', 'LineWidth', 2);hold off
+set(gca, 'FontName','Century', 'FontSize',12);
+% axis([0 69 -0.3 15]);
+% set(gca,'YTick',[-4,-2,0,2,4,6,8,10,12,14]);
+% ylim([-4 14]);
+xlabel('Time[s]');
+% ylabel('Amplitude[nV]');
+
+% name=strcat('C:\Users\m-kawano\Documents\参考\CTcolonoscopy\一時/area',num2str(SumArea),'Sum');
+% saveas(gcf, name, 'jpg');
 %}
 % ----- 電位分布 ここまで -----
