@@ -1,5 +1,5 @@
-function V=SigmoidColonCurve(Time, Qx, Qy, Qz, CI)
-
+function V=SigmoidColonCurve(Time, Qx, Qy, Qz, CI, Oc)
+model;
 Theta=2*pi;
 Frequency=2;    % 周波数：2cpm
 Delta=0.00011*(10^3);  % バンド幅：0.00011m
@@ -22,15 +22,16 @@ time = rem(Time,30)+1;
 % Rcc=[13 13 16 20 18 9 2 6 7 4 10 11 9 19 20 27 17 15 15 15 13 15 18 10 11 6 7 11 14 17];
 
 % いきめ大腸肛門外科内科
-% Rcc=[14 9 7 8 11 15 13 8 4 4 2 5 11 12 12 12 22 22 19 14 13 15 14 14 17 9 6 9 13 15];R
+% Rcc=[14 9 7 8 11 15 13 8 4 4 2 5 11 12 12 12 22 22 19 14 13 15 14 14 17 9 6 9 13 15];
 
 % 150803
 % Rcc=[9 15 13 10 17 20 12 7 13 17 11 12 15 23 20 11 7 8 9 10 12 13 17 15 6 11 10 16 17 20];
 
 % 1509182
-Rcc=[8 10 9 8 12 9 4 6 9 10 13 15 17 18 13 9 12 9 10 8 13 14 9 5 2 7 11 11 15 19];
+% Rcc=[8 10 9 8 12 9 4 6 9 10 13 15 17 18 13 9 12 9 10 8 13 14 9 5 2 7 11 11 15 19];
 
-R=Rcc(time)*10;
+R=sqrt(Oc(1)^2+Oc(2)^2+Oc(3)^2)*10;
+% R=Rcc(time)*10;
 % R=10*10;
 
 % ダイポールモーメント密度 P/S
@@ -39,11 +40,16 @@ Density=0.45.*10.^(-9)./(2.*Rcb.*pi.*Delta);
 
 Rc=RadiusCylinder(time, Rcb, CI);
 OQ=sqrt((Qx)^2+(Qy)^2+(Qz)^2);
-Alpha_Q=asin(Qz/sqrt(Qy^2+Qz^2));       % yz平面上でy軸と点Qの角度(∠QyOQz)
-Ac=Alpha(time);                         % yz平面上でy軸と点Ocの角度(∠OcyOOcz)
-Phi_Q=acos(Qy/sqrt(Qx^2+Qy^2));         % xy平面上のy軸と点Qの角度(∠QyOQx)
+Aq=asin(Qz/sqrt(Qy^2+Qz^2));       % XY平面から点Qの角度(∠QxyOQxyz)
+% Aq=atan2(Qz,Qy);
+% Ac=Alpha(time);                         % XY平面から点Ocの角度(∠OcxyOOcxyz)
+Ac=atan2(Oc(3),Oc(2));
+Pq=acos(Qy/sqrt(Qx^2+Qy^2));         % XY平面上のy軸と点Qの角度(∠QyzOQxyz)
+% Pq=atan2(Qx,Qy);
 
-Int=@(Theta, width) Density.*Inner_productDR(time, Theta, R, Rc, OQ, Phi_Q, Alpha_Q, Ac)./(Rho(time, Theta, R, Rc, OQ, Alpha_Q, Phi_Q, Ac).^2);
+% Int=@(Theta, width) Density.*Inner_productDR(time, Theta, R, Rc, OQ, Pq, Aq, Ac)./(Rho(time, Theta, R, Rc, OQ, Aq, Pq, Ac).^2);
+Int=@(Theta, width) Density.*Inner_productDR(Oc(1), Theta, R, Rc, OQ, Pq, Aq, Ac)./(Rho(Oc(1), Theta, R, Rc, OQ, Aq, Pq, Ac).^2);
 
-V=integral2(Int, 0,Theta, 0,Delta)/(4.*pi.*Eps);
+% V=integral2(Int, 0,Theta, 0,Delta)/(4.*pi.*Eps);
+V=-integral2(Int, 0,Theta, 0,Delta)/(4.*pi.*Eps);
 end

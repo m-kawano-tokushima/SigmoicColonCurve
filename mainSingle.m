@@ -3,6 +3,8 @@ Base=zeros(timemax,1);  % 中心電極での電位
 Vol=zeros(timemax, 5);  % 各測定電極での電位
 res=zeros(timemax, 5);  % 各電位差
 onecycle=30;
+paturn=6;
+model;
 
 Electrode0Position=[0.0675*(10^3) 0.20*(10^3) 0.20*(10^3)];     % 中心電極位置(デカルト座標系)
 Electrode1Position=[0.0675*(10^3) 0.13*(10^3) 0.08*(10^3)];     % 電極-Ch1位置(デカルト座標系)
@@ -101,20 +103,18 @@ SumArea=4;  % 総和を求める象限
 Max=zeros(onecycle,51);
 MAX=zeros(1,onecycle);
 
-for i=1:onecycle
+for time=1:onecycle
     for j=1:51
         if j==25||j==26||j==27
             for k=1:51
-                map(j,k,i)=NaN;
+                map(j,k,time)=NaN;
             end
         else
             for k=1:51
                 if k==24 || k==25 || k==26 || k==27 || k==28
-                    map(j,k,i)=NaN;
-%                 elseif k>26
-%                     map(j,k,i)=-(10^12)*(SigmoidColonCurve(i-1, Electrode0Position(1), tate(j), yoko(k), ConstrictionInterval));
+                    map(j,k,time)=NaN;
                 else
-                    map(j,k,i)=(10^12)*(SigmoidColonCurve(i-1, Electrode0Position(1), tate(j), yoko(k), ConstrictionInterval));
+                    map(j,k,time)=(10^12)*(SigmoidColonCurve(time-1, Electrode0Position(1), tate(j), yoko(k), ConstrictionInterval, modelpaturn(paturn).Oc(time,:)));
                 end
             end
         end
@@ -141,14 +141,15 @@ for i=1:onecycle
 %     if i==1 || i==2 || i==3 || i==4 || i==5 || i==6 || i==7 || i==8 || i==28
 
     % 1509182
-    if i==1 || i==2 || i==4 || i==5 || i==6 || i==25
+%     if time==1 || time==2 || time==4 || time==6 || time==6 || time==25
+    if abs(atan2(modelpaturn(paturn).Oc(time,3),modelpaturn(paturn).Oc(time,2)))>2/3*pi
         for j=1:51
             for k =1:51
-                corr(j,52-k,i)=map(j,k,i);
+                corr(j,52-k,time)=map(j,k,time);
             end
         end
 
-        map(:,:,i)=corr(:,:,i);
+        map(:,:,time)=corr(:,:,time);
     end
     
     %{
@@ -161,43 +162,46 @@ for i=1:onecycle
     % いきめ
 %     if i==2 || i==3 || i==6 || i==10 || i==11 || i==20 || i==21 || i==22 || i==23 || i==24 || i==25 || i==26 || i==27 || i==29 || i==30
     
-    % 150806
+    % 150803
 %     if i==1 || i==2 || i==3 || i==19 || i==20 || i==21 || i==22 || i==23 || i==24 || i==25 || i==26 || i==27 || i==29 || i==30
 
     % 1509182
-    if i==1 || i==2 || i==3 || i==7 || i==8 || i==9 || i==17 || i==18 || i==19 || i==20 || i==21 || i==22 || i==23  || i==24 || i==25 || i==26 || i==27 || i==28 || i==29 || i==30
-        map(:,:,i)=-map(:,:,i);
+%     if time==1 || time==2 || time==3 || time==7 || time==8 || time==9 || time==17 || time==18 || time==19 || time==20 || time==21 || time==22 || time==23  || time==24 || time==25 || time==26 || time==27 || time==28 || time==29 || time==30
+    if modelpaturn(paturn).Oc(time,3)<0
+        map(:,:,time)=-map(:,:,time);
     end
     
-    Base(i)=map(26+Electrode0Position(2)/10,26+Electrode0Position(3)/10,i);
-    map2(:,:,i)=map(:,:,i)-Base(i);
+    Base(time)=map(26+Electrode0Position(2)/10,26+Electrode0Position(3)/10,time);
+    map2(:,:,time)=map(:,:,time)-Base(time);
 
-    Max(i,:)=max(map2(:,:,i));
-    MAX(i)=max(Max(i,:));
-    map3(:,:,i)=map2(:,:,i)/MAX(i);
+    Max(time,:)=max(map2(:,:,time));
+    MAX(time)=max(Max(time,:));
+
+    map3(:,:,time)=map2(:,:,time)/MAX(time);
 end
-%{
+% %{
 % 電位分布図　出力
 [X2,Y2]=meshgrid(yoko,tate);
 figure;
 for i=1:onecycle
-%     subplot(5,6,i);
-    figure;
+    subplot(5,6,i);
+%     figure;
     surf(X2,Y2,map2(:,:,i));
     shading('flat');
 %     colorbar;
-%     caxis([0 MAX(i)*10^9]);
+    caxis([-MAX(i) MAX(i)]);
     xlim([-250 250]);
     ylim([-250 250]);
     set(gca,'XTick',[-250,-200,-150,-100,-50,0,50,100,150,200,250]);
     set(gca,'YTick',[-250,-200,-150,-100,-50,0,50,100,150,200,250]);
-    view(90,90);
+%     view(90,90);
+    view(90,-90);
     
 %     name=strcat('C:\Users\m-kawano\Documents\参考\CTcolonoscopy\一時/',num2str(i));
 %     saveas(gcf, name, 'jpg')
 end
 
-% %{
+%{
 % avi出力
 obj=VideoWriter('C:\Users\m-kawano\Documents\参考\CTcolonoscopy\一時/modelname');
 obj.FrameRate=1;
@@ -211,7 +215,7 @@ end
 close(obj);
 %}
 
-% %{
+%{
 % バンドが各象限に与える影響　出力
 areaSum=VVV(map3);
 time=0:29;
@@ -223,14 +227,15 @@ plot(time,areaSum(:,4),'m', 'LineWidth', 2);hold off
 set(gca, 'FontName','Century', 'FontSize',12);
 % axis([0 69 -0.3 15]);
 % set(gca,'YTick',[-4,-2,0,2,4,6,8,10,12,14]);
-% ylim([-4 14]);
+ylim([-250 250]);
 xlabel('Time[s]');
-% ylabel('Amplitude[nV]');
+ylabel('Amplitude[nV]');
 
-% name=strcat('C:\Users\m-kawano\Documents\参考\CTcolonoscopy\一時/areaSum');
-% saveas(gcf, name, 'jpg');
+name=strcat('C:\Users\m-kawano\Documents\参考\CTcolonoscopy\一時/areaSum');
+saveas(gcf, name, 'jpg');
+areaSum=0;
 %}
-% %{
+%{
 % バンドが指定象限に与える影響の詳細　出力
 areaSum=Vsum(map3, SumArea);
 time=0:29;
@@ -242,11 +247,13 @@ plot(time,areaSum(:,4),'m', 'LineWidth', 2);hold off
 set(gca, 'FontName','Century', 'FontSize',12);
 % axis([0 69 -0.3 15]);
 % set(gca,'YTick',[-4,-2,0,2,4,6,8,10,12,14]);
-% ylim([-4 14]);
+ylim([-20 70]);
 xlabel('Time[s]');
-% ylabel('Amplitude[nV]');
+ylabel('Amplitude[nV]');
 
-% name=strcat('C:\Users\m-kawano\Documents\参考\CTcolonoscopy\一時/area',num2str(SumArea),'Sum');
-% saveas(gcf, name, 'jpg');
+name=strcat('C:\Users\m-kawano\Documents\参考\CTcolonoscopy\一時/area',num2str(SumArea),'Sum');
+saveas(gcf, name, 'jpg');
+areaSum=0;
+%}
 %}
 % ----- 電位分布 ここまで -----
