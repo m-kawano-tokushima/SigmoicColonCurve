@@ -3,7 +3,7 @@ Base=zeros(timemax,1);  % 中心電極での電位
 Vol=zeros(timemax, 5);  % 各測定電極での電位
 res=zeros(timemax, 5);  % 各電位差
 onecycle=30;
-paturn=6;
+paturn=7;
 model;
 
 Electrode0Position=[0.0675*(10^3) 0.20*(10^3) 0.20*(10^3)];     % 中心電極位置(デカルト座標系)
@@ -201,8 +201,8 @@ for i=1:onecycle
 %     saveas(gcf, name, 'jpg')
 end
 
+%% avi出力
 %{
-% avi出力
 obj=VideoWriter('C:\Users\m-kawano\Documents\参考\CTcolonoscopy\一時/modelname');
 obj.FrameRate=1;
 open(obj)
@@ -215,8 +215,8 @@ end
 close(obj);
 %}
 
+%% バンドが各象限に与える影響　出力
 %{
-% バンドが各象限に与える影響　出力
 areaSum=VVV(map3);
 time=0:29;
 figure;
@@ -235,8 +235,9 @@ name=strcat('C:\Users\m-kawano\Documents\参考\CTcolonoscopy\一時/areaSum');
 saveas(gcf, name, 'jpg');
 areaSum=0;
 %}
+
+%% バンドが指定象限に与える影響の詳細　出力
 %{
-% バンドが指定象限に与える影響の詳細　出力
 areaSum=Vsum(map3, SumArea);
 time=0:29;
 figure;
